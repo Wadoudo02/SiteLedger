@@ -45,6 +45,10 @@ function documentBlock(file: InvoiceFile): Anthropic.ContentBlockParam {
 
 /** Real extraction: Claude reads the PDF or photo and returns schema-checked fields. */
 export async function claudeExtractInvoice(file: InvoiceFile): Promise<ExtractedInvoice> {
+  if (!process.env.ANTHROPIC_API_KEY) {
+    console.error("ANTHROPIC_API_KEY is not set in this environment");
+    throw new ExtractionUnavailableError("Invoice reading isn't configured on this server yet.");
+  }
   let response;
   try {
     response = await client.messages.parse({
@@ -80,7 +84,7 @@ export async function claudeExtractInvoice(file: InvoiceFile): Promise<Extracted
       });
     }
     // Anything else (e.g. the reply failing schema validation) counts as malformed output.
-    console.error("Unreadable model output:", err instanceof Error ? err.message : err);
+    console.error("Unreadable model output:", err instanceof Error ? `${err.name}: ${err.message}` : err);
     throw new MalformedOutputError("Model output did not match the schema", { cause: err });
   }
 
