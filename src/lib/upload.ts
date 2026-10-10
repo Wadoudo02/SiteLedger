@@ -23,7 +23,7 @@ export const EXTENSIONS: Record<SupportedMimeType, string> = {
   "image/webp": "webp",
 };
 
-/** "Henshaws Roofing & Building Ltd" -> "henshaws-roofing-building-ltd" (safe Blob path segment). */
+/** "Orbital Roofing & Building Ltd" -> "orbital-roofing-building-ltd" (safe Blob path segment). */
 export function slug(value: string): string {
   return (
     value

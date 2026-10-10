@@ -111,8 +111,8 @@ export function runChecks(d: InvoiceDraft, ctx: CheckContext): CheckResult {
 
 /**
  * Normalised supplier for duplicate matching: case, punctuation, "&"/"and" and company
- * suffixes are ignored, so "Henshaws Roofing & Building Supplies Ltd" and
- * "HENSHAWS ROOFING AND BUILDING SUPPLIES" match. Returns null if nothing is left.
+ * suffixes are ignored, so "Orbital Roofing & Building Supplies Ltd" and
+ * "ORBITAL ROOFING AND BUILDING SUPPLIES" match. Returns null if nothing is left.
  */
 export function supplierKey(supplier: string | null): string | null {
   const key = (supplier ?? "")

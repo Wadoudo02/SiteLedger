@@ -18,7 +18,7 @@ export const extractedInvoiceSchema = z.object({
   gross: z.string().nullable(),
   category: z.enum(CATEGORIES).nullable(),
   deliveryPostcode: z.string().nullable(),
-  // Verbatim text that refers to a job or site (e.g. "Your Reference: 13 Halstead"). Shown to the reviewer only.
+  // Verbatim text that refers to a job or site (e.g. "Your Reference: 1 Martian"). Shown to the reviewer only.
   propertyHint: z.string().nullable(),
 });
 export type ExtractedInvoice = z.infer<typeof extractedInvoiceSchema>;

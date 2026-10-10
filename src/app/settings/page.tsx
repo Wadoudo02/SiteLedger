@@ -73,11 +73,11 @@ async function PropertiesSection() {
       <ActionForm action={addProperty} className="grid gap-3 sm:grid-cols-3">
         <label className={`${labelClass} sm:col-span-2`}>
           <span>Property address</span>
-          <input name="name" placeholder="13 Halstead Avenue, Chorlton" required className={inputClass} />
+          <input name="name" placeholder="1 Martian Street, Olympus Mons" required className={inputClass} />
         </label>
         <label className={labelClass}>
           <span>Postcode</span>
-          <input name="postcode" placeholder="M21 9FT" required className={inputClass} />
+          <input name="postcode" placeholder="JP4 2GS" required className={inputClass} />
         </label>
         <div className="sm:col-span-3">
           <SubmitButton>Add property</SubmitButton>

@@ -36,14 +36,14 @@ describe("formatPence", () => {
 
 describe("postcodes", () => {
   it("normalises and formats", () => {
-    expect(normalisePostcode(" m21 9ft ")).toBe("M219FT");
-    expect(formatPostcode("M219FT")).toBe("M21 9FT");
+    expect(normalisePostcode(" jp4 2gs ")).toBe("JP42GS");
+    expect(formatPostcode("JP42GS")).toBe("JP4 2GS");
     expect(formatPostcode("SW1A1AA")).toBe("SW1A 1AA");
   });
 
   it("validates UK postcode shape", () => {
-    for (const ok of ["M219FT", "SW1A1AA", "S101TJ", "BS65QA"]) expect(isValidPostcode(ok)).toBe(true);
-    for (const bad of ["", "12345", "M21", "HALSTEAD"]) expect(isValidPostcode(bad)).toBe(false);
+    for (const ok of ["JP42GS", "SW1A1AA", "S101TJ", "BS65QA"]) expect(isValidPostcode(ok)).toBe(true);
+    for (const bad of ["", "12345", "M21", "OLYMPUS"]) expect(isValidPostcode(bad)).toBe(false);
   });
 });
 
@@ -65,26 +65,26 @@ describe("draftFromExtraction", () => {
   it("converts model output to pence, trims and normalises", () => {
     expect(
       draftFromExtraction({
-        supplier: "  Plumbfix ",
-        invoiceNumber: "A28168417737",
+        supplier: "  PipeDream ",
+        invoiceNumber: "P31940227615",
         invoiceDate: "2026-09-21",
         net: "14.99",
         vat: "3.00",
         gross: "£17.99",
         category: "materials",
         deliveryPostcode: null,
-        propertyHint: " Your Reference: 13 Halstead ",
+        propertyHint: " Your Reference: 1 Martian ",
       }),
     ).toEqual({
-      supplier: "Plumbfix",
-      invoiceNumber: "A28168417737",
+      supplier: "PipeDream",
+      invoiceNumber: "P31940227615",
       invoiceDate: "2026-09-21",
       netPence: 1499,
       vatPence: 300,
       grossPence: 1799,
       category: "materials",
       deliveryPostcode: null,
-      propertyHint: "Your Reference: 13 Halstead",
+      propertyHint: "Your Reference: 1 Martian",
     });
   });
 
@@ -97,11 +97,11 @@ describe("draftFromExtraction", () => {
       vat: null,
       gross: null,
       category: null,
-      deliveryPostcode: " m20 2zb",
+      deliveryPostcode: " mr1 4rs",
       propertyHint: null,
     });
     expect(draft.supplier).toBeNull();
     expect(draft.netPence).toBeNull();
-    expect(draft.deliveryPostcode).toBe("M202ZB");
+    expect(draft.deliveryPostcode).toBe("MR14RS");
   });
 });

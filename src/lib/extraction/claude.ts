@@ -23,7 +23,7 @@ function instructions(buyer: string): string {
 - net, vat, gross: the invoice TOTALS exactly as printed (net / sub-total excluding VAT, total VAT, total including VAT) as plain decimal strings such as "734.40", without currency symbols or commas. If a total is not printed, return null. Do not work it out.
 - category: "materials" for goods, building supplies and tools; "labour" for work or services carried out by people; "other" for anything else (hire, delivery charges, fees).
 - deliveryPostcode: the postcode of the DELIVERY or SITE address only ("Deliver to", "Delivery address", "Site address"). ${buyer} Any "Invoice to", "Bill to", "Customer", "Sold to" or registered-office address is never the site: never return its postcode. If there is no delivery or site address, return null.
-- propertyHint: copy word for word any text that names the job or site, such as "Your Reference: 13 Halstead" or a job name. Null if there is none.
+- propertyHint: copy word for word any text that names the job or site, such as "Your Reference: 1 Martian" or a job name. Null if there is none.
 
 Use null for anything that is not printed or that you cannot read with confidence.`;
 }

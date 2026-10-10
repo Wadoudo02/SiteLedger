@@ -3,24 +3,24 @@ import { checkAmounts, checkDate, checkRequired, invoiceNumberKey, resolveProper
 import type { InvoiceDraft } from "./invoice";
 
 const clean: InvoiceDraft = {
-  supplier: "Henshaws Roofing & Building Supplies Ltd",
+  supplier: "Orbital Roofing & Building Supplies Ltd",
   invoiceNumber: "03S01015",
   invoiceDate: "2026-09-29",
   netPence: 61200,
   vatPence: 12240,
   grossPence: 73440,
   category: "materials",
-  deliveryPostcode: "M202ZB",
+  deliveryPostcode: "MR14RS",
   propertyHint: null,
 };
 
 const ctx: CheckContext = {
   today: "2026-10-10",
   properties: [
-    { id: 1, postcode: "M202ZB" },
-    { id: 2, postcode: "M219FT" },
+    { id: 1, postcode: "MR14RS" },
+    { id: 2, postcode: "JP42GS" },
   ],
-  billingPostcodes: ["SK43RA", "SK93RR"],
+  billingPostcodes: ["YD34TE", "SP90LE"],
   chosenPropertyId: null,
   duplicateOf: null,
 };
@@ -34,10 +34,10 @@ describe("runChecks", () => {
 
   it("collects every failure, not just the first", () => {
     const bad = { ...clean, supplier: null, grossPence: 99999, invoiceDate: "2027-01-01", deliveryPostcode: null };
-    const { reasons, propertyId } = runChecks(bad, { ...ctx, duplicateOf: "invoice 03S01015 (£734.40), filed under 16 Ashwood Avenue, Sep 2026" });
+    const { reasons, propertyId } = runChecks(bad, { ...ctx, duplicateOf: "invoice 03S01015 (£734.40), filed under 1 Martian Street, Sep 2026" });
     expect(propertyId).toBeNull();
     expect(reasons).toHaveLength(5); // missing supplier, arithmetic, future date, duplicate, no property
-    expect(reasons).toContain("Possible duplicate of invoice 03S01015 (£734.40), filed under 16 Ashwood Avenue, Sep 2026.");
+    expect(reasons).toContain("Possible duplicate of invoice 03S01015 (£734.40), filed under 1 Martian Street, Sep 2026.");
   });
 });
 
@@ -62,10 +62,10 @@ describe("checkRequired", () => {
 
 describe("checkAmounts", () => {
   it.each([
-    ["Henshaws PDF", 61200, 12240, 73440],
-    ["Henshaws photo (21.708 rounds to 21.71)", 10854, 2171, 13025],
-    ["Henshaws PDF 2 (18.416 rounds to 18.42)", 9208, 1842, 11050],
-    ["Plumbfix (2.998 rounds to 3.00)", 1499, 300, 1799],
+    ["Orbital PDF", 61200, 12240, 73440],
+    ["Orbital photo (21.708 rounds to 21.71)", 10854, 2171, 13025],
+    ["Orbital PDF 2 (18.416 rounds to 18.42)", 9208, 1842, 11050],
+    ["PipeDream (2.998 rounds to 3.00)", 1499, 300, 1799],
     ["5% VAT", 10000, 500, 10500],
     ["0% VAT", 10000, 0, 10000],
   ])("passes real/valid figures: %s", (_, net, vat, gross) => {
@@ -154,10 +154,10 @@ describe("resolveProperty", () => {
   });
 
   it("never matches one of the user's billing addresses", () => {
-    const sameAsBilling = { ...ctx, properties: [...ctx.properties, { id: 3, postcode: "SK93RR" }] };
-    expect(resolveProperty({ ...clean, deliveryPostcode: "SK93RR" }, sameAsBilling)).toEqual({
+    const sameAsBilling = { ...ctx, properties: [...ctx.properties, { id: 3, postcode: "SP90LE" }] };
+    expect(resolveProperty({ ...clean, deliveryPostcode: "SP90LE" }, sameAsBilling)).toEqual({
       propertyId: null,
-      reason: "Delivery postcode SK9 3RR is one of your own billing addresses. Choose the property.",
+      reason: "Delivery postcode SP9 0LE is one of your own billing addresses. Choose the property.",
     });
   });
 
@@ -168,20 +168,20 @@ describe("resolveProperty", () => {
   });
 
   it("flags a postcode shared by several properties (e.g. flats)", () => {
-    const flats = { ...ctx, properties: [{ id: 1, postcode: "M202ZB" }, { id: 5, postcode: "M202ZB" }] };
+    const flats = { ...ctx, properties: [{ id: 1, postcode: "MR14RS" }, { id: 5, postcode: "MR14RS" }] };
     expect(resolveProperty(clean, flats)).toEqual({
       propertyId: null,
-      reason: "Delivery postcode M20 2ZB matches several properties. Choose one.",
+      reason: "Delivery postcode MR1 4RS matches several properties. Choose one.",
     });
   });
 });
 
 describe("duplicate keys", () => {
   it("supplier key ignores case, punctuation, '&' vs 'and' and company suffixes", () => {
-    expect(supplierKey("Henshaws Roofing & Building Supplies Ltd")).toBe(
-      supplierKey("HENSHAWS ROOFING AND BUILDING SUPPLIES LIMITED"),
+    expect(supplierKey("Orbital Roofing & Building Supplies Ltd")).toBe(
+      supplierKey("ORBITAL ROOFING AND BUILDING SUPPLIES LIMITED"),
     );
-    expect(supplierKey("Henshaws")).not.toBe(supplierKey("Plumbfix"));
+    expect(supplierKey("Orbital")).not.toBe(supplierKey("PipeDream"));
   });
 
   it("invoice number key ignores case and punctuation", () => {

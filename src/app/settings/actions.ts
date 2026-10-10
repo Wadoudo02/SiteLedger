@@ -29,7 +29,7 @@ export async function addProperty(_prev: ActionResult, formData: FormData): Prom
   const name = text(formData, "name");
   const postcode = normalisePostcode(text(formData, "postcode"));
   if (!name) return { ok: false, message: "Enter the property address." };
-  if (!isValidPostcode(postcode)) return { ok: false, message: "Enter a valid UK postcode, e.g. M21 9FT." };
+  if (!isValidPostcode(postcode)) return { ok: false, message: "Enter a valid UK postcode, e.g. JP4 2GS." };
 
   const sql = await db();
   const rows = await sql`

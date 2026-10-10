@@ -6,20 +6,23 @@ Small landlords and builders upload building invoices (PDF or photo). SiteLedger
 
 ## Try it
 
-1. Open the live app. Three fictional properties and six sample invoices are already loaded.
-2. **Upload** any PDF from [`samples/`](samples). Each one demonstrates a case:
+The live app is loaded with a fictional company (Charbak Contracting) and three fictional properties: **Mars** (MR1 4RS), **Jupiter** (JP4 2GS) and **Saturn** (ST6 9RR).
 
-   | File | What happens |
-   |---|---|
-   | `01`, `02`, `03` | Filed automatically (03 has 5% VAT) |
-   | `04-…-wrong-vat-arithmetic` | Needs Review: net + VAT ≠ gross |
-   | `05-…-DUPLICATE` | Needs Review: duplicate of 01 |
-   | `06-…-no-delivery-address` | Needs Review: choose the property. The "Job ref" hint is shown. |
+1. **Upload** any receipt from [`examples/`](examples). There are 15 PDFs and phone photos from five fictional suppliers ([contact sheet](examples/contact_sheet.jpg)). Receipts already in the app come back as **duplicates**, which is itself a check working.
+2. Open **Needs Review**. The Hammer Time till receipts print only a total (no net, VAT or delivery address), so a person completes them; the "JOB REF" hint shows which property they belong to.
+3. Open a property for its dashboard, and use **Download Excel**.
 
-   Uploading an already-processed sample again is itself caught as a duplicate.
-3. Open **Needs Review**, fix or reject an invoice, then open a property to see its dashboard and **Download Excel**.
+[`samples/`](samples) has 6 more generated PDFs covering the failure cases: wrong arithmetic, a duplicate, and no delivery address. Regenerate them with `npm run samples`.
 
-Regenerate the samples with `npm run samples`.
+### Accuracy on the examples
+
+`node --env-file=.env scripts/eval-examples.mjs` uploads all 15 receipts and scores the result against [`examples/ground_truth.csv`](examples/ground_truth.csv). The live run scored **65/75 fields correct**: 10 filed automatically and 5 went to review.
+
+- Every date, and every amount that is printed on the receipt, was read exactly.
+- Every delivery postcode matched the right property. This includes photos, two billing addresses, and a VAT figure 1p off due to rounding.
+- **The 10 misses are not misreads:**
+  - **6 are on the Hammer Time till receipts**, which print no net or VAT. The ground truth derives them; the app deliberately never calculates what isn't printed.
+  - **4 are naming conventions:** the model used the trading name ("PipeDream", "Knotty Pine") where the CSV has the registered name ("PipeDream Direct", "Knotty Pine Timber").
 
 ## How it works
 
@@ -92,3 +95,5 @@ Improvements noted along the way:
 - Credit notes (negative amounts currently go to review).
 - Server-side model fallback on refusals, and an accuracy and cost comparison against Claude Haiku 5.5.
 - Undo for rejected invoices, and an audit log of reviewer edits.
+- Prompt: on till receipts with no invoice number, use the receipt or transaction number, so duplicate detection also covers receipts. Prefer the registered supplier name.
+- Settings: the "Property removed" confirmation disappears along with the removed row.

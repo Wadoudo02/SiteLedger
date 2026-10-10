@@ -82,7 +82,7 @@ Month is derived from `invoice_date`, never stored separately.
 
 `real_invoice_examples/` (git-ignored; we have permission to use them, not to publish them) holds real UK builders' merchant invoices. Lessons learned:
 - Dates are printed in formats like `29Sep26` and `21/09/2026`. The model returns ISO; code validates.
-- Some invoices have **no delivery address** at all. Only a reference such as "Your Reference: 13 Halstead" hints at the site.
+- Some invoices have **no delivery address** at all. Only a reference such as "Your Reference: 1 Martian" hints at the site.
 - Street names can be misspelled. Postcodes are the reliable key.
 - VAT is consistent with `round(net × 20%)`.
 
