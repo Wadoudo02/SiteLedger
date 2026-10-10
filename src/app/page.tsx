@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Suspense } from "react";
 import { listProperties } from "@/lib/properties";
 import { formatPostcode } from "@/lib/postcode";
@@ -32,9 +33,11 @@ async function HomeContent() {
         ) : (
           <ul className="divide-y divide-slate-200 rounded-lg border border-slate-200 bg-white">
             {properties.map((p) => (
-              <li key={p.id} className="flex justify-between px-4 py-3">
-                <span>{p.name}</span>
-                <span className="font-mono text-sm text-slate-500">{formatPostcode(p.postcode)}</span>
+              <li key={p.id}>
+                <Link href={`/properties/${p.id}`} className="flex justify-between px-4 py-3 hover:bg-slate-50">
+                  <span className="underline-offset-2 hover:underline">{p.name}</span>
+                  <span className="font-mono text-sm text-slate-500">{formatPostcode(p.postcode)}</span>
+                </Link>
               </li>
             ))}
           </ul>
