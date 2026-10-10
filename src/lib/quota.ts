@@ -1,7 +1,7 @@
 import { db } from "./db";
 import { todayInLondon } from "./dates";
 
-export const DAILY_EXTRACTION_LIMIT = 30;
+export const DAILY_EXTRACTION_LIMIT = 100;
 
 /**
  * Atomically counts one extraction attempt against today's app-wide cap.

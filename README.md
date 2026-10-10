@@ -48,7 +48,7 @@ upload ─► validate file ─► daily cap ─► extractInvoice() ─► chec
 - **Duplicates:** same invoice number **and** (same gross **or** same supplier), searched across all invoices. Partial unique indexes in Postgres back this up.
 - **Review:** *Confirm* re-runs every check and files only if they all pass. *Reject* keeps the invoice out of totals and the export.
 - **Errors get friendly messages:** empty file, over 4 MB, unsupported type (detected from the file bytes, not the extension), API errors and rate limits. Malformed model output is not an error: the file is kept and sent to review for manual entry.
-- **The daily cap** is 30 extractions app-wide, counted per attempt with an atomic SQL upsert.
+- **The daily cap** is 100 extractions app-wide, counted per attempt with an atomic SQL upsert.
 
 ## Data model
 

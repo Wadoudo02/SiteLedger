@@ -40,7 +40,7 @@ Small landlords and builders upload building invoices (PDF or photo). The app ex
   5. Property matched by postcode, **in code**, against the saved property list
   6. Valid date, not in the future
 - **Friendly error messages** for: empty uploads, oversized uploads (limit **4 MB**), unsupported file types, malformed model output, API errors and rate limits.
-- **Cap extractions at 30 per day app-wide**, so a public URL cannot drain API credit.
+- **Cap extractions at 100 per day app-wide** (raised from 30 at the user's request), so a public URL cannot drain API credit.
 - **Secrets come from environment variables only.** Never print, log, echo or commit them. Never `cat .env`.
 - **Never claim something works until it has been run.** Report test and command output honestly.
 - Unit tests for the checks module, and run them.

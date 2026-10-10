@@ -1,9 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { cardClass, inputClass, labelClass } from "@/components/styles";
 
 const MAX_BYTES = 4 * 1024 * 1024;
+
+const noopSubscribe = () => () => {};
+
+/** False in the server HTML, true once React has hydrated and the submit handler is attached. */
+function useHydrated() {
+  return useSyncExternalStore(noopSubscribe, () => true, () => false);
+}
 
 type UploadResult =
   | { kind: "filed"; propertyName: string }
@@ -11,6 +18,7 @@ type UploadResult =
   | { kind: "error"; message: string };
 
 export function UploadForm({ properties }: { properties: { id: number; name: string }[] }) {
+  const hydrated = useHydrated();
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<UploadResult | null>(null);
 
@@ -66,7 +74,8 @@ export function UploadForm({ properties }: { properties: { id: number; name: str
       </div>
       <button
         type="submit"
-        disabled={busy}
+        // Disabled until hydrated: an early click would otherwise do a plain GET form submit and upload nothing.
+        disabled={busy || !hydrated}
         className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
       >
         {busy ? "Reading invoice…" : "Upload invoice"}
