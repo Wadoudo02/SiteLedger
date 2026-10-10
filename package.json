@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:setup": "node --env-file=.env scripts/db-setup.mjs",
+    "check-env": "node --env-file=.env scripts/check-env.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",
