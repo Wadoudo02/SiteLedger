@@ -9,7 +9,8 @@
     "lint": "eslint",
     "db:setup": "node --env-file=.env scripts/db-setup.mjs",
     "check-env": "node --env-file=.env scripts/check-env.mjs",
-    "test": "vitest run"
+    "test": "vitest run",
+    "samples": "node scripts/generate-samples.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",
@@ -28,6 +29,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.4.0",
+    "pdf-lib": "^1.17.1",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^5.0.3"

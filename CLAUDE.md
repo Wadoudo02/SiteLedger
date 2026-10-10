@@ -94,6 +94,10 @@ Write a script that generates 5–6 fake invoice PDFs from fictional suppliers f
 
 Authentication, Google Drive sync, email ingestion, line items, payments.
 
+## Future improvements (agreed, not now)
+
+Multi-invoice mode; several properties sharing a postcode (flats); credit notes; Haiku comparison.
+
 ## Next.js 16 notes
 
 - Next.js **16.4** with `cacheComponents: true` (see AGENTS.md). Read `node_modules/next/dist/docs/` before using an unfamiliar API.
