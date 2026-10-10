@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { isValidIsoDate, todayInLondon } from "./dates";
 import { draftFromExtraction } from "./invoice";
 import { formatPence, parsePence } from "./money";
-import { formatPostcode, normalisePostcode } from "./postcode";
+import { formatPostcode, isValidPostcode, normalisePostcode } from "./postcode";
 
 describe("parsePence", () => {
   it.each([
@@ -40,6 +40,11 @@ describe("postcodes", () => {
     expect(formatPostcode("M219FT")).toBe("M21 9FT");
     expect(formatPostcode("SW1A1AA")).toBe("SW1A 1AA");
   });
+
+  it("validates UK postcode shape", () => {
+    for (const ok of ["M219FT", "SW1A1AA", "S101TJ", "BS65QA"]) expect(isValidPostcode(ok)).toBe(true);
+    for (const bad of ["", "12345", "M21", "HALSTEAD"]) expect(isValidPostcode(bad)).toBe(false);
+  });
 });
 
 describe("dates", () => {
@@ -68,6 +73,7 @@ describe("draftFromExtraction", () => {
         gross: "£17.99",
         category: "materials",
         deliveryPostcode: null,
+        propertyHint: " Your Reference: 13 Halstead ",
       }),
     ).toEqual({
       supplier: "Plumbfix",
@@ -78,6 +84,7 @@ describe("draftFromExtraction", () => {
       grossPence: 1799,
       category: "materials",
       deliveryPostcode: null,
+      propertyHint: "Your Reference: 13 Halstead",
     });
   });
 
@@ -91,6 +98,7 @@ describe("draftFromExtraction", () => {
       gross: null,
       category: null,
       deliveryPostcode: " m20 2zb",
+      propertyHint: null,
     });
     expect(draft.supplier).toBeNull();
     expect(draft.netPence).toBeNull();

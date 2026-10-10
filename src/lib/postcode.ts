@@ -7,3 +7,8 @@ export function normalisePostcode(input: string): string {
 export function formatPostcode(normalised: string): string {
   return normalised.length > 3 ? `${normalised.slice(0, -3)} ${normalised.slice(-3)}` : normalised;
 }
+
+/** Basic UK postcode shape check on a normalised postcode ("M219FT", "SW1A1AA"). */
+export function isValidPostcode(normalised: string): boolean {
+  return /^[A-Z]{1,2}[0-9][A-Z0-9]?[0-9][A-Z]{2}$/.test(normalised);
+}

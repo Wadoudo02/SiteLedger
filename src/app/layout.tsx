@@ -30,6 +30,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <Link href="/" className="font-semibold">
               SiteLedger
             </Link>
+            <Link href="/" className="text-sm text-slate-600 hover:text-slate-900">
+              Upload
+            </Link>
+            <Link href="/settings" className="text-sm text-slate-600 hover:text-slate-900">
+              Settings
+            </Link>
           </nav>
         </header>
         <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">{children}</main>

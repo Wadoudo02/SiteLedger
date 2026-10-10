@@ -28,6 +28,10 @@ create table if not exists invoices (
   gross_pence integer,
   category text check (category in ('materials', 'labour', 'other')),
   site_postcode text,
+  property_hint text,
+  -- Normalised keys for the duplicate check (computed in code, see src/lib/checks.ts).
+  supplier_key text,
+  invoice_number_key text,
   review_reasons jsonb not null default '[]',
   blob_url text not null,
   blob_pathname text not null,
@@ -45,9 +49,19 @@ create table if not exists invoices (
   )
 );
 
--- Safety net behind the duplicate check in code.
-create unique index if not exists invoices_filed_supplier_number
-  on invoices (lower(supplier), lower(invoice_number)) where status = 'filed';
+-- Migrations for databases created before these columns existed.
+alter table invoices add column if not exists property_hint text;
+alter table invoices add column if not exists supplier_key text;
+alter table invoices add column if not exists invoice_number_key text;
+drop index if exists invoices_filed_supplier_number;
+
+-- Duplicate rule: same invoice number AND (same gross OR same supplier).
+-- The check in code searches all non-rejected invoices; these indexes are the safety net for filed ones.
+create index if not exists invoices_number_key on invoices (invoice_number_key);
+create unique index if not exists invoices_filed_number_gross
+  on invoices (invoice_number_key, gross_pence) where status = 'filed';
+create unique index if not exists invoices_filed_number_supplier
+  on invoices (invoice_number_key, supplier_key) where status = 'filed';
 
 create index if not exists invoices_property_date on invoices (property_id, invoice_date);
 

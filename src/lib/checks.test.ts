@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { checkAmounts, checkDate, checkRequired, dedupeKey, resolveProperty, runChecks, type CheckContext } from "./checks";
+import { checkAmounts, checkDate, checkRequired, invoiceNumberKey, resolveProperty, runChecks, supplierKey, type CheckContext } from "./checks";
 import type { InvoiceDraft } from "./invoice";
 
 const clean: InvoiceDraft = {
@@ -11,6 +11,7 @@ const clean: InvoiceDraft = {
   grossPence: 73440,
   category: "materials",
   deliveryPostcode: "M202ZB",
+  propertyHint: null,
 };
 
 const ctx: CheckContext = {
@@ -21,7 +22,7 @@ const ctx: CheckContext = {
   ],
   billingPostcodes: ["SK43RA", "SK93RR"],
   chosenPropertyId: null,
-  duplicateExists: false,
+  duplicateOf: null,
 };
 
 const amounts = (netPence: number, vatPence: number, grossPence: number) => ({ ...clean, netPence, vatPence, grossPence });
@@ -33,9 +34,10 @@ describe("runChecks", () => {
 
   it("collects every failure, not just the first", () => {
     const bad = { ...clean, supplier: null, grossPence: 99999, invoiceDate: "2027-01-01", deliveryPostcode: null };
-    const { reasons, propertyId } = runChecks(bad, { ...ctx, duplicateExists: true });
+    const { reasons, propertyId } = runChecks(bad, { ...ctx, duplicateOf: "invoice 03S01015 (£734.40), filed under 16 Ashwood Avenue, Sep 2026" });
     expect(propertyId).toBeNull();
     expect(reasons).toHaveLength(5); // missing supplier, arithmetic, future date, duplicate, no property
+    expect(reasons).toContain("Possible duplicate of invoice 03S01015 (£734.40), filed under 16 Ashwood Avenue, Sep 2026.");
   });
 });
 
@@ -174,21 +176,22 @@ describe("resolveProperty", () => {
   });
 });
 
-describe("dedupeKey", () => {
-  it("ignores case, punctuation, '&' vs 'and' and company suffixes", () => {
-    expect(dedupeKey("Henshaws Roofing & Building Supplies Ltd", "03S01015")).toBe(
-      dedupeKey("HENSHAWS ROOFING AND BUILDING SUPPLIES LIMITED", "03s-01015"),
+describe("duplicate keys", () => {
+  it("supplier key ignores case, punctuation, '&' vs 'and' and company suffixes", () => {
+    expect(supplierKey("Henshaws Roofing & Building Supplies Ltd")).toBe(
+      supplierKey("HENSHAWS ROOFING AND BUILDING SUPPLIES LIMITED"),
     );
+    expect(supplierKey("Henshaws")).not.toBe(supplierKey("Plumbfix"));
   });
 
-  it("distinguishes different invoice numbers and different suppliers", () => {
-    expect(dedupeKey("Henshaws", "03S01015")).not.toBe(dedupeKey("Henshaws", "03S01117"));
-    expect(dedupeKey("Henshaws", "1001")).not.toBe(dedupeKey("Plumbfix", "1001"));
+  it("invoice number key ignores case and punctuation", () => {
+    expect(invoiceNumberKey("03S-01015")).toBe(invoiceNumberKey("03s01015"));
+    expect(invoiceNumberKey("03S01015")).not.toBe(invoiceNumberKey("03S01117"));
   });
 
-  it("returns null when supplier or number is missing", () => {
-    expect(dedupeKey(null, "1001")).toBeNull();
-    expect(dedupeKey("Henshaws", null)).toBeNull();
-    expect(dedupeKey("Ltd", "1001")).toBeNull();
+  it("returns null when nothing usable is left", () => {
+    expect(supplierKey(null)).toBeNull();
+    expect(supplierKey("Ltd")).toBeNull();
+    expect(invoiceNumberKey(" - ")).toBeNull();
   });
 });

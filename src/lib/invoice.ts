@@ -18,6 +18,8 @@ export const extractedInvoiceSchema = z.object({
   gross: z.string().nullable(),
   category: z.enum(CATEGORIES).nullable(),
   deliveryPostcode: z.string().nullable(),
+  // Verbatim text that refers to a job or site (e.g. "Your Reference: 13 Halstead"). Shown to the reviewer only.
+  propertyHint: z.string().nullable(),
 });
 export type ExtractedInvoice = z.infer<typeof extractedInvoiceSchema>;
 
@@ -31,6 +33,7 @@ export type InvoiceDraft = {
   grossPence: number | null;
   category: Category | null;
   deliveryPostcode: string | null;
+  propertyHint: string | null;
 };
 
 function clean(value: string | null): string | null {
@@ -49,5 +52,6 @@ export function draftFromExtraction(e: ExtractedInvoice): InvoiceDraft {
     grossPence: parsePence(e.gross),
     category: e.category,
     deliveryPostcode: postcode ? normalisePostcode(postcode) : null,
+    propertyHint: clean(e.propertyHint),
   };
 }

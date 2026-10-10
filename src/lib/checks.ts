@@ -13,7 +13,9 @@ export type CheckContext = {
   properties: { id: number; postcode: string }[]; // normalised postcodes
   billingPostcodes: string[]; // the user's own "Invoice to" postcodes, normalised
   chosenPropertyId: number | null; // picked by the user; overrides postcode matching
-  duplicateExists: boolean; // another non-rejected invoice has the same dedupeKey
+  // Description of an existing non-rejected invoice with the same invoice number AND
+  // (same gross OR same supplier), found by the caller via findDuplicate(); null if none.
+  duplicateOf: string | null;
 };
 
 export type CheckResult = {
@@ -101,26 +103,28 @@ export function resolveProperty(
 
 export function runChecks(d: InvoiceDraft, ctx: CheckContext): CheckResult {
   const reasons = [...checkRequired(d), ...checkAmounts(d), ...checkDate(d, ctx.today)];
-  if (ctx.duplicateExists) {
-    reasons.push(`Possible duplicate: invoice ${d.invoiceNumber} from ${d.supplier} has already been uploaded.`);
-  }
+  if (ctx.duplicateOf) reasons.push(`Possible duplicate of ${ctx.duplicateOf}.`);
   const { propertyId, reason } = resolveProperty(d, ctx);
   if (reason) reasons.push(reason);
   return { reasons, propertyId };
 }
 
 /**
- * Key for the duplicate check: case, punctuation, "&"/"and" and company suffixes are ignored,
- * so "Henshaws Roofing & Building Supplies Ltd" and "HENSHAWS ROOFING AND BUILDING SUPPLIES"
- * are the same supplier. Returns null if either part is missing.
+ * Normalised supplier for duplicate matching: case, punctuation, "&"/"and" and company
+ * suffixes are ignored, so "Henshaws Roofing & Building Supplies Ltd" and
+ * "HENSHAWS ROOFING AND BUILDING SUPPLIES" match. Returns null if nothing is left.
  */
-export function dedupeKey(supplier: string | null, invoiceNumber: string | null): string | null {
-  if (!supplier || !invoiceNumber) return null;
-  const supplierKey = supplier
+export function supplierKey(supplier: string | null): string | null {
+  const key = (supplier ?? "")
     .toLowerCase()
     .replace(/&/g, " and ")
     .replace(/\b(and|ltd|limited|plc|llp)\b/g, " ")
     .replace(/[^a-z0-9]/g, "");
-  const numberKey = invoiceNumber.toLowerCase().replace(/[^a-z0-9]/g, "");
-  return supplierKey && numberKey ? `${supplierKey}|${numberKey}` : null;
+  return key || null;
+}
+
+/** Normalised invoice number: "03S-01015" and "03s01015" match. */
+export function invoiceNumberKey(invoiceNumber: string | null): string | null {
+  const key = (invoiceNumber ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  return key || null;
 }
