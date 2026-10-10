@@ -77,6 +77,12 @@ Write a script that generates 5–6 fake invoice PDFs from fictional suppliers f
 
 Authentication, Google Drive sync, email ingestion, line items, payments.
 
+## Next.js 16 notes
+
+- Next.js **16.4** with `cacheComponents: true` (see AGENTS.md). Read `node_modules/next/dist/docs/` before using an unfamiliar API.
+- DB-backed UI must **not** use `"use cache"`. Put async data components inside `<Suspense>` so they render at request time, which keeps figures always fresh. GET route handlers that query the DB run at request time.
+- npm's global cache on this machine has permission issues. Use `npm install --cache <scratchpad>/npm-cache`.
+
 ## Working style
 
 - One step at a time. Explain each step briefly, then do it.

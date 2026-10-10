@@ -9,8 +9,9 @@ build/
 next-env.d.ts
 
 # env files (secrets)
-.env
-.env*.local
+.env*
+!.env.example
+*.pem
 
 # vercel
 .vercel
