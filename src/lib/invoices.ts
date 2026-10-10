@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { del, put } from "@vercel/blob";
+import { copy, del, put } from "@vercel/blob";
 import { invoiceNumberKey, runChecks, supplierKey, type CheckContext } from "./checks";
 import { getCompany } from "./company";
 import { isValidIsoDate, todayInLondon } from "./dates";
@@ -110,4 +110,92 @@ export async function createInvoice(input: {
   }
 
   return { id, status, reasons, propertyName };
+}
+
+export type ReviewInvoice = {
+  id: string;
+  supplier: string | null;
+  invoice_number: string | null;
+  invoice_date: string | null;
+  net_pence: number | null;
+  vat_pence: number | null;
+  gross_pence: number | null;
+  category: InvoiceDraft["category"];
+  site_postcode: string | null;
+  property_hint: string | null;
+  property_id: number | null;
+  review_reasons: string[];
+  blob_url: string;
+  blob_pathname: string;
+  original_filename: string;
+  mime_type: SupportedMimeType;
+  created_at: string;
+};
+
+const REVIEW_COLUMNS = `id, supplier, invoice_number, invoice_date::text as invoice_date, net_pence, vat_pence, gross_pence,
+  category, site_postcode, property_hint, property_id, review_reasons, blob_url, blob_pathname,
+  original_filename, mime_type, created_at::text as created_at`;
+
+export async function listNeedsReview(): Promise<ReviewInvoice[]> {
+  const sql = await db();
+  return (await sql.query(
+    `select ${REVIEW_COLUMNS} from invoices where status = 'needs_review' order by created_at`,
+  )) as ReviewInvoice[];
+}
+
+export async function getReviewInvoice(id: string): Promise<ReviewInvoice | null> {
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return null;
+  const sql = await db();
+  const [row] = await sql.query(
+    `select ${REVIEW_COLUMNS} from invoices where id = $1 and status = 'needs_review'`,
+    [id],
+  );
+  return (row as ReviewInvoice | undefined) ?? null;
+}
+
+/**
+ * Re-runs every check on the reviewer's edits. If they pass, the file moves from review/ to its
+ * filed path and the invoice is filed. If not, the edits and new reasons are saved for another go.
+ */
+export async function confirmReviewedInvoice(
+  invoice: ReviewInvoice,
+  draft: InvoiceDraft,
+  chosenPropertyId: number | null,
+): Promise<{ filed: boolean; reasons: string[] }> {
+  const ctx = await buildCheckContext(draft, chosenPropertyId, invoice.id);
+  const { reasons, propertyId } = runChecks(draft, ctx);
+  const sql = await db();
+  const fields = [
+    propertyId ?? chosenPropertyId, draft.supplier, draft.invoiceNumber, storableDate(draft.invoiceDate),
+    draft.netPence, draft.vatPence, draft.grossPence, draft.category,
+    supplierKey(draft.supplier), invoiceNumberKey(draft.invoiceNumber), JSON.stringify(reasons),
+  ];
+  const setFields = `property_id = $2, supplier = $3, invoice_number = $4, invoice_date = $5, net_pence = $6,
+    vat_pence = $7, gross_pence = $8, category = $9, supplier_key = $10, invoice_number_key = $11, review_reasons = $12`;
+
+  if (reasons.length > 0) {
+    await sql.query(`update invoices set ${setFields} where id = $1`, [invoice.id, ...fields]);
+    return { filed: false, reasons };
+  }
+
+  const ext = invoice.blob_pathname.split(".").pop()!;
+  const pathname = filedPath(ctx.propertyNames.get(propertyId!)!, draft.invoiceDate!, draft.supplier!, draft.invoiceNumber!, ext);
+  const moved = await copy(invoice.blob_url, pathname, { access: "public", addRandomSuffix: false, contentType: invoice.mime_type });
+  try {
+    await sql.query(
+      `update invoices set ${setFields}, status = 'filed', filed_at = now(), blob_url = $13, blob_pathname = $14
+       where id = $1 and status = 'needs_review'`,
+      [invoice.id, ...fields, moved.url, moved.pathname],
+    );
+  } catch (err) {
+    await del(moved.url).catch(() => {});
+    throw err;
+  }
+  await del(invoice.blob_url).catch(() => {});
+  return { filed: true, reasons: [] };
+}
+
+export async function rejectInvoice(id: string): Promise<void> {
+  const sql = await db();
+  await sql`update invoices set status = 'rejected' where id = ${id} and status = 'needs_review'`;
 }

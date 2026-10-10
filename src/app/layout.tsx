@@ -33,6 +33,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <Link href="/" className="text-sm text-slate-600 hover:text-slate-900">
               Upload
             </Link>
+            <Link href="/review" className="text-sm text-slate-600 hover:text-slate-900">
+              Needs Review
+            </Link>
             <Link href="/settings" className="text-sm text-slate-600 hover:text-slate-900">
               Settings
             </Link>
