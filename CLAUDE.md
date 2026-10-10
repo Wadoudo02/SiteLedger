@@ -2,6 +2,11 @@
 
 2-hour timed take-home (Algosoup). Everything is logged and reviewed. Work carefully, keep scope tight, verify everything.
 
+## Links
+
+- Live: https://site-ledger-lyart.vercel.app (auto-deploys from `main`). Note: `site-ledger.vercel.app` is someone else's app.
+- Repo: https://github.com/Wadoudo02/SiteLedger
+
 ## Product
 
 Small landlords and builders upload building invoices (PDF or photo). The app extracts supplier, invoice number, date, net, VAT, gross and category (`materials` | `labour` | `other`), runs checks **in code**, and files the invoice under property and month.
