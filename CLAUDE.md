@@ -48,6 +48,10 @@ Small landlords and builders upload building invoices (PDF or photo). The app ex
 
 ## Agreed decisions
 
+- **Singular invoice mode**: one uploaded file (PDF or photo) = exactly one invoice. Multi-invoice mode is a possible later extension.
+- **Property resolution**: the user can pick the property at upload (this overrides postcode matching). Otherwise it's matched by the delivery postcode. No postcode, a billing-address postcode, no match, or several matches → Needs Review, where the human picks from the saved property list.
+- **The company can have several billing ("Invoice to") addresses.** All of them are ignored for matching. Real invoices show the same company billed at different addresses.
+
 - **VAT check tolerance ±2p**: `|vat − round(net × rate)| ≤ 2` for some rate in {20%, 5%, 0%}. `net + VAT = gross` stays **exact**.
 - **Blob paths**: clean invoices go straight to `properties/{property}/{YYYY-MM}/{supplier}-{invoice-no}.{ext}`. Needs Review invoices go to `review/{id}.{ext}` and are copied to the final path when confirmed (path segments slugified).
 - **Review queue**: *Confirm* re-runs all checks and files only if they pass. *Reject* sets status `rejected`, which is excluded from totals and the export.
@@ -73,6 +77,14 @@ extraction_usage  day date pk, count int
 ```
 
 Month is derived from `invoice_date`, never stored separately.
+
+## Real invoice examples
+
+`real_invoice_examples/` (git-ignored; we have permission to use them, not to publish them) holds real UK builders' merchant invoices. Lessons learned:
+- Dates are printed in formats like `29Sep26` and `21/09/2026`. The model returns ISO; code validates.
+- Some invoices have **no delivery address** at all. Only a reference such as "Your Reference: 13 Halstead" hints at the site.
+- Street names can be misspelled. Postcodes are the reliable key.
+- VAT is consistent with `round(net × 20%)`.
 
 ## Demo data
 

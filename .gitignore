@@ -16,6 +16,9 @@ next-env.d.ts
 # vercel
 .vercel
 
+# real invoices (permission to use for testing, not to publish)
+real_invoice_examples/
+
 # assessment brief
 Take-Home Technical_ Algosoup.pdf
 
