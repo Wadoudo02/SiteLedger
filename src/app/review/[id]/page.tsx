@@ -12,7 +12,7 @@ const pounds = (pence: number | null) => (pence === null ? "" : (pence / 100).to
 
 export default function ReviewInvoicePage({ params }: PageProps<"/review/[id]">) {
   return (
-    <Suspense fallback={<p className="text-slate-500">Loading…</p>}>
+    <Suspense fallback={<p className="text-stone-500">Loading…</p>}>
       <ReviewInvoice params={params} />
     </Suspense>
   );
@@ -35,9 +35,9 @@ async function ReviewInvoice({ params }: { params: PageProps<"/review/[id]">["pa
       </section>
 
       <section className="space-y-4">
-        <h1 className="text-2xl font-semibold">Review invoice</h1>
-        <div className="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-900">
-          <p className="font-medium">Why it needs review:</p>
+        <h1 className="text-3xl font-semibold tracking-tight">Review invoice</h1>
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+          <p className="font-medium">⚠ Why it needs review:</p>
           <ul className="list-disc pl-5">
             {invoice.review_reasons.map((r) => (
               <li key={r}>{r}</li>
@@ -97,7 +97,7 @@ async function ReviewInvoice({ params }: { params: PageProps<"/review/[id]">["pa
             </select>
           </label>
           {invoice.property_hint && (
-            <p className="text-sm text-slate-600 sm:col-span-2">
+            <p className="rounded-lg bg-orange-50 px-3 py-2 text-sm text-stone-700 sm:col-span-2">
               Invoice mentions: <strong>&ldquo;{invoice.property_hint}&rdquo;</strong>
             </p>
           )}

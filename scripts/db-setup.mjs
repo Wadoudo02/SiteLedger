@@ -18,13 +18,14 @@ console.log(`Applied ${statements.length} schema statements.`);
 // Fictional demo data. Postcodes are stored normalised (uppercase, no spaces).
 await sql`
   insert into company (id, name, address, postcode)
-  values (1, 'Harbour Lane Lettings Ltd', 'Unit 4, 20 Harbour Lane, Bristol', 'BS14QD')
+  values (1, 'Charbak Contracting', '12 Crumpet Close, Much Dunking, Yorkshire', 'YD34TE')
   on conflict (id) do nothing`;
 
+// Matches the fictional receipts in examples/ (see examples/ground_truth.csv).
 const properties = [
-  ["12 Larch Avenue, Bristol", "BS65QA"],
-  ["Flat 3, 41 Mill Lane, Leeds", "LS62EX"],
-  ["7 Quarry Row, Sheffield", "S101TJ"],
+  ["1 Martian Street, Olympus Mons, Mars", "MR14RS"],
+  ["42 Great Red Spot Lane, Io Heights, Jupiter", "JP42GS"],
+  ["7 Ring Road, Titan Vale, Saturn", "ST69RR"],
 ];
 for (const [name, postcode] of properties) {
   await sql`insert into properties (name, postcode) values (${name}, ${postcode}) on conflict (postcode) do nothing`;

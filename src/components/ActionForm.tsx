@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
+import { primaryButtonClass, subtleButtonClass } from "./styles";
 
 export type ActionResult = { ok: boolean; message: string } | null;
 
@@ -20,7 +21,8 @@ export function ActionForm({
     <form action={formAction} className={className}>
       {children}
       {result && (
-        <p role="status" className={`text-sm ${result.ok ? "text-emerald-700" : "text-red-700"}`}>
+        <p role="status" className={`text-sm font-medium ${result.ok ? "text-emerald-700" : "text-red-700"}`}>
+          {result.ok ? "✓ " : "⚠ "}
           {result.message}
         </p>
       )}
@@ -30,12 +32,8 @@ export function ActionForm({
 
 export function SubmitButton({ children, variant = "primary" }: { children: React.ReactNode; variant?: "primary" | "subtle" }) {
   const { pending } = useFormStatus();
-  const style =
-    variant === "primary"
-      ? "bg-slate-900 text-white hover:bg-slate-700"
-      : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-100";
   return (
-    <button type="submit" disabled={pending} className={`rounded-md px-3 py-1.5 text-sm font-medium disabled:opacity-50 ${style}`}>
+    <button type="submit" disabled={pending} className={variant === "primary" ? primaryButtonClass : subtleButtonClass}>
       {pending ? "Saving…" : children}
     </button>
   );

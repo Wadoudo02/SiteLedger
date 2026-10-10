@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useSyncExternalStore } from "react";
-import { cardClass, inputClass, labelClass } from "@/components/styles";
+import { cardClass, inputClass, labelClass, primaryButtonClass } from "@/components/styles";
 
 const MAX_BYTES = 4 * 1024 * 1024;
 
@@ -58,7 +58,13 @@ export function UploadForm({ properties }: { properties: { id: number; name: str
       <div className="grid gap-4 sm:grid-cols-2">
         <label className={labelClass}>
           <span>Invoice (PDF or photo, max 4 MB, one invoice per file)</span>
-          <input name="file" type="file" accept="application/pdf,image/jpeg,image/png,image/webp" required className={inputClass} />
+          <input
+            name="file"
+            type="file"
+            accept="application/pdf,image/jpeg,image/png,image/webp"
+            required
+            className={`${inputClass} cursor-pointer border-dashed py-3 file:mr-3 file:rounded-md file:border-0 file:bg-orange-50 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-orange-800 hover:file:bg-orange-100`}
+          />
         </label>
         <label className={labelClass}>
           <span>Property</span>
@@ -76,19 +82,19 @@ export function UploadForm({ properties }: { properties: { id: number; name: str
         type="submit"
         // Disabled until hydrated: an early click would otherwise do a plain GET form submit and upload nothing.
         disabled={busy || !hydrated}
-        className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
+        className={primaryButtonClass}
       >
         {busy ? "Reading invoice…" : "Upload invoice"}
       </button>
 
       {result?.kind === "filed" && (
-        <p role="status" className="rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
-          All checks passed. Filed under <strong>{result.propertyName}</strong>.
+        <p role="status" className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-900">
+          ✓ All checks passed. Filed under <strong>{result.propertyName}</strong>.
         </p>
       )}
       {result?.kind === "review" && (
-        <div role="status" className="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-900">
-          <p className="font-medium">Sent to Needs Review:</p>
+        <div role="status" className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+          <p className="font-medium">⚠ Sent to Needs Review:</p>
           <ul className="list-disc pl-5">
             {result.reasons.map((r) => (
               <li key={r}>{r}</li>
@@ -97,8 +103,8 @@ export function UploadForm({ properties }: { properties: { id: number; name: str
         </div>
       )}
       {result?.kind === "error" && (
-        <p role="alert" className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-800">
-          {result.message}
+        <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+          ✕ {result.message}
         </p>
       )}
     </form>

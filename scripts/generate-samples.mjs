@@ -5,14 +5,14 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 
-const BUYER = ["Harbour Lane Lettings Ltd", "Unit 4, 20 Harbour Lane", "Bristol", "BS1 4QD"];
+const BUYER = ["Charbak Contracting", "12 Crumpet Close", "Much Dunking, Yorkshire", "YD3 4TE"];
 
 const invoices = [
   {
     file: "01-brunel-timber-clean.pdf",
     supplier: ["Brunel Timber Merchants Ltd", "Cattle Market Road", "Bristol", "BS1 6QS"],
     number: "BTM-20417", date: "14/08/2026",
-    deliverTo: ["12 Larch Avenue", "Bristol", "BS6 5QA"],
+    deliverTo: ["1 Martian Street", "Olympus Mons, Mars", "MR1 4RS"],
     lines: [["40", "C24 Treated Timber 47x100mm 4.8m", "11.25"], ["6", "OSB3 Board 18mm 2440x1220", "22.50"]],
     net: "585.00", vat: "117.00", gross: "702.00",
   },
@@ -20,7 +20,7 @@ const invoices = [
     file: "02-pennine-plumbing-clean.pdf",
     supplier: ["Pennine Plumbing Services", "18 Viaduct Street", "Leeds", "LS4 2BT"],
     number: "PPS-0932", date: "02/09/2026",
-    deliverTo: ["Flat 3, 41 Mill Lane", "Leeds", "LS6 2EX"],
+    deliverTo: ["42 Great Red Spot Lane", "Io Heights, Jupiter", "JP4 2GS"],
     lines: [["1", "Labour: replace bathroom waste and supply pipework", "320.00"]],
     net: "320.00", vat: "64.00", gross: "384.00",
   },
@@ -28,7 +28,7 @@ const invoices = [
     file: "03-steel-city-electrical-5pc-vat.pdf",
     supplier: ["Steel City Electrical Ltd", "Unit 9, Don Valley Works", "Sheffield", "S9 3HU"],
     number: "SCE/26/1188", date: "19/09/2026",
-    deliverTo: ["7 Quarry Row", "Sheffield", "S10 1TJ"],
+    deliverTo: ["7 Ring Road", "Titan Vale, Saturn", "ST6 9RR"],
     lines: [["1", "Labour: install loft insulation (energy-saving, reduced rate)", "860.00"]],
     net: "860.00", vat: "43.00", gross: "903.00", vatLabel: "VAT 5%",
   },
@@ -36,7 +36,7 @@ const invoices = [
     file: "04-avon-roofing-wrong-vat-arithmetic.pdf",
     supplier: ["Avon Roofing Supplies", "Feeder Road Trade Park", "Bristol", "BS2 0TQ"],
     number: "ARS-5521", date: "24/09/2026",
-    deliverTo: ["12 Larch Avenue", "Bristol", "BS6 5QA"],
+    deliverTo: ["1 Martian Street", "Olympus Mons, Mars", "MR1 4RS"],
     lines: [["20", "Natural Slate 500x250mm (pack of 20)", "25.00"]],
     // Deliberate error: 500.00 + 100.00 = 600.00, but the total says 610.00.
     net: "500.00", vat: "100.00", gross: "610.00",
@@ -45,7 +45,7 @@ const invoices = [
     file: "05-brunel-timber-DUPLICATE.pdf",
     supplier: ["Brunel Timber Merchants Ltd", "Cattle Market Road", "Bristol", "BS1 6QS"],
     number: "BTM-20417", date: "14/08/2026", copy: true,
-    deliverTo: ["12 Larch Avenue", "Bristol", "BS6 5QA"],
+    deliverTo: ["1 Martian Street", "Olympus Mons, Mars", "MR1 4RS"],
     lines: [["40", "C24 Treated Timber 47x100mm 4.8m", "11.25"], ["6", "OSB3 Board 18mm 2440x1220", "22.50"]],
     net: "585.00", vat: "117.00", gross: "702.00",
   },
@@ -53,7 +53,7 @@ const invoices = [
     file: "06-yorkshire-tool-hire-no-delivery-address.pdf",
     supplier: ["Yorkshire Tool Hire", "Kirkstall Road", "Leeds", "LS3 1JF"],
     number: "YTH-77310", date: "03/10/2026",
-    deliverTo: null, reference: "Job ref: Mill Lane flat 3",
+    deliverTo: null, reference: "Job ref: Great Red Spot Lane",
     lines: [["1", "Tile cutter hire, 1 week (collected from branch)", "45.00"]],
     net: "45.00", vat: "9.00", gross: "54.00",
   },

@@ -9,8 +9,8 @@ import { addProperty, deleteProperty, saveCompany } from "./actions";
 export default function SettingsPage() {
   return (
     <div className="space-y-8">
-      <h1 className="text-2xl font-semibold">Settings</h1>
-      <Suspense fallback={<p className="text-slate-500">Loading…</p>}>
+      <h1 className="text-3xl font-semibold tracking-tight">Settings</h1>
+      <Suspense fallback={<p className="text-stone-500">Loading…</p>}>
         <CompanySection />
         <PropertiesSection />
       </Suspense>
@@ -23,7 +23,7 @@ async function CompanySection() {
   return (
     <section className={cardClass}>
       <h2 className="text-lg font-semibold">Your company</h2>
-      <p className="mb-4 text-sm text-slate-600">
+      <p className="mb-4 text-sm text-stone-600">
         This is the &ldquo;Invoice to&rdquo; (billing) address on your invoices. It is never used to match a property:
         invoices are filed by their delivery address.
       </p>
@@ -53,15 +53,15 @@ async function PropertiesSection() {
   return (
     <section className={cardClass}>
       <h2 className="text-lg font-semibold">Properties</h2>
-      <p className="mb-4 text-sm text-slate-600">
+      <p className="mb-4 text-sm text-stone-600">
         Invoices are filed automatically when their delivery postcode matches one of these.
       </p>
-      <ul className="mb-6 divide-y divide-slate-200 rounded-md border border-slate-200">
-        {properties.length === 0 && <li className="px-4 py-3 text-sm text-slate-500">No properties yet.</li>}
+      <ul className="mb-6 divide-y divide-stone-200 rounded-md border border-stone-200">
+        {properties.length === 0 && <li className="px-4 py-3 text-sm text-stone-500">No properties yet.</li>}
         {properties.map((p) => (
           <li key={p.id} className="flex items-center justify-between gap-4 px-4 py-2">
             <span>
-              {p.name} <span className="ml-2 font-mono text-sm text-slate-500">{formatPostcode(p.postcode)}</span>
+              {p.name} <span className="ml-2 font-mono text-sm text-stone-500">{formatPostcode(p.postcode)}</span>
             </span>
             <ActionForm action={deleteProperty} className="flex items-center gap-3">
               <input type="hidden" name="id" value={p.id} />
