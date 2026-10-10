@@ -5,6 +5,7 @@ import { cardClass, primaryButtonClass } from "@/components/styles";
 import { formatPence } from "@/lib/money";
 import { formatPostcode } from "@/lib/postcode";
 import { getPropertyReport, monthLabel } from "@/lib/reports";
+import { DeleteInvoiceButton } from "../DeleteInvoiceButton";
 
 export default function PropertyPage({ params }: PageProps<"/properties/[id]">) {
   return (
@@ -95,7 +96,10 @@ async function Property({ params }: { params: PageProps<"/properties/[id]">["par
                       <th className="py-1 pr-3 text-right font-medium">Net</th>
                       <th className="py-1 pr-3 text-right font-medium">VAT</th>
                       <th className="py-1 pr-3 text-right font-medium">Gross</th>
-                      <th className="py-1 font-medium">File</th>
+                      <th className="py-1 pr-3 font-medium">File</th>
+                      <th className="py-1 font-medium">
+                        <span className="sr-only">Actions</span>
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-stone-100">
@@ -110,10 +114,13 @@ async function Property({ params }: { params: PageProps<"/properties/[id]">["par
                           <td className="py-1.5 pr-3 text-right tabular-nums">{formatPence(i.net_pence)}</td>
                           <td className="py-1.5 pr-3 text-right tabular-nums">{formatPence(i.vat_pence)}</td>
                           <td className="py-1.5 pr-3 text-right tabular-nums">{formatPence(i.gross_pence)}</td>
-                          <td className="py-1.5">
+                          <td className="py-1.5 pr-3">
                             <a href={i.blob_url} target="_blank" rel="noreferrer" className="font-medium text-orange-700 hover:underline">
                               Open
                             </a>
+                          </td>
+                          <td className="py-1.5 text-right">
+                            <DeleteInvoiceButton id={i.id} label={`${i.supplier} invoice ${i.invoice_number}`} />
                           </td>
                         </tr>
                       ))}
@@ -126,7 +133,7 @@ async function Property({ params }: { params: PageProps<"/properties/[id]">["par
                       <td className="pt-2 pr-3 text-right tabular-nums">{formatPence(m.net_pence)}</td>
                       <td className="pt-2 pr-3 text-right tabular-nums">{formatPence(m.vat_pence)}</td>
                       <td className="pt-2 pr-3 text-right tabular-nums">{formatPence(m.gross_pence)}</td>
-                      <td />
+                      <td colSpan={2} />
                     </tr>
                   </tfoot>
                 </table>

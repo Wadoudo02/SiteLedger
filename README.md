@@ -6,17 +6,29 @@ Small landlords and builders upload building invoices (PDF or photo). SiteLedger
 
 ## Try it
 
-The live app is loaded with a fictional company (Charbak Contracting) and three fictional properties: **Mars** (MR1 4RS), **Jupiter** (JP4 2GS) and **Saturn** (ST6 9RR).
+The live app is loaded with a fictional company (Charbak Contracting) and three fictional properties: **Mars** (MR1 4RS), **Jupiter** (JP4 2GS) and **Saturn** (ST6 9RR). The receipts in [`examples/`](examples) are fictional PDFs and phone photos from five suppliers ([contact sheet](examples/contact_sheet.jpg), [ground truth](examples/ground_truth.csv)). They are split by whether they are already in the app.
 
-1. **Upload** any receipt from [`examples/`](examples). There are 15 PDFs and phone photos from five fictional suppliers ([contact sheet](examples/contact_sheet.jpg)). Receipts already in the app come back as **duplicates**, which is itself a check working.
-2. Open **Needs Review**. The Hammer Time till receipts print only a total (no net, VAT or delivery address), so a person completes them; the "JOB REF" hint shows which property they belong to.
-3. Open a property for its dashboard, and use **Download Excel**.
+**[`examples/not-on-the-system/`](examples/not-on-the-system): upload these to see them processed fresh.**
 
-[`samples/`](samples) has 6 more generated PDFs covering the failure cases: wrong arithmetic, a duplicate, and no delivery address. Regenerate them with `npm run samples`.
+| File | What happens |
+|---|---|
+| `05_mars_knotty.pdf` | Files automatically under Mars |
+| `10_jupiter_knotty.jpg` | Photo; files automatically under Jupiter |
+| `15_saturn_orbital.jpg` | Photo; files automatically under Saturn (October) |
+| `07_jupiter_hammer.jpg` | Till receipt with only a total, so it goes to Needs Review. The "JOB REF" hint names the property. |
+| `09_jupiter_pipedream.pdf` | No delivery address, so it goes to Needs Review. The "Your Reference" hint names the property. |
+
+**[`examples/on-the-system/`](examples/on-the-system): already filed (or waiting in Needs Review).** Upload any of these to see the **duplicate check** catch it.
+
+**Delete anything you like.** On a property's page, each invoice row has a **Delete** button, which removes the invoice and its stored file. A deleted receipt can then be uploaded again from `examples/` and is treated as new. In Needs Review, **Reject** removes an invoice from totals.
+
+Then open **Needs Review** to correct and file an invoice, and open a property for its dashboard and **Download Excel**.
+
+[`samples/`](samples) has 6 more generated PDFs covering the failure cases: wrong arithmetic, a duplicate of sample 01, and no delivery address. None are on the system. Regenerate them with `npm run samples`.
 
 ### Accuracy on the examples
 
-`node --env-file=.env scripts/eval-examples.mjs` uploads all 15 receipts and scores the result against [`examples/ground_truth.csv`](examples/ground_truth.csv). The live run scored **65/75 fields correct**: 10 filed automatically and 5 went to review.
+`node --env-file=.env scripts/eval-examples.mjs` uploads all 15 receipts (both folders) and scores the result against [`examples/ground_truth.csv`](examples/ground_truth.csv). The live run scored **65/75 fields correct**: 10 filed automatically and 5 went to review.
 
 - Every date, and every amount that is printed on the receipt, was read exactly.
 - Every delivery postcode matched the right property. This includes photos, two billing addresses, and a VAT figure 1p off due to rounding.
@@ -50,6 +62,7 @@ upload ─► validate file ─► daily cap ─► extractInvoice() ─► chec
 - **Property matching:** you can pick the property at upload, which overrides matching. Otherwise the **delivery/site** postcode is matched against saved properties. The "Invoice to" (billing) address is ignored, both in the prompt and in code. No delivery address, no match, or several matches sends the invoice to review.
 - **Duplicates:** same invoice number **and** (same gross **or** same supplier), searched across all invoices. Partial unique indexes in Postgres back this up.
 - **Review:** *Confirm* re-runs every check and files only if they all pass. *Reject* keeps the invoice out of totals and the export.
+- **Delete:** a filed invoice can be deleted from its property page (e.g. refunded or cancelled). Deleting removes the row and the stored file, so the same invoice can be uploaded again.
 - **Errors get friendly messages:** empty file, over 4 MB, unsupported type (detected from the file bytes, not the extension), API errors and rate limits. Malformed model output is not an error: the file is kept and sent to review for manual entry.
 - **The daily cap** is 100 extractions app-wide, counted per attempt with an atomic SQL upsert.
 

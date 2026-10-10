@@ -1,7 +1,8 @@
 // Uploads every receipt in examples/ to a running SiteLedger and compares what was
 // extracted with examples/ground_truth.csv.
 // Usage: node --env-file=.env scripts/eval-examples.mjs [baseUrl]   (default: the live site)
-// Each upload uses one of the app's daily extractions.
+// Each upload uses one of the app's daily extractions. Receipts already on the system come back as duplicates
+// (still scored: the fields are read before the duplicate check).
 import { readFile } from "node:fs/promises";
 import { neon } from "@neondatabase/serverless";
 
@@ -43,7 +44,9 @@ const outcomes = { filed: 0, needs_review: 0, error: 0 };
 
 for (const truth of rows) {
   const form = new FormData();
-  const bytes = await readFile(new URL(truth.file, dir));
+  const bytes = await readFile(new URL(truth.file, dir)).catch(() =>
+    readFile(new URL(`on-the-system/${truth.file}`, dir)).catch(() => readFile(new URL(`not-on-the-system/${truth.file}`, dir))),
+  );
   form.append("file", new Blob([bytes]), truth.file);
   const res = await fetch(`${BASE}/api/invoices`, { method: "POST", body: form });
   const body = await res.json();

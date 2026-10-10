@@ -199,3 +199,13 @@ export async function rejectInvoice(id: string): Promise<void> {
   const sql = await db();
   await sql`update invoices set status = 'rejected' where id = ${id} and status = 'needs_review'`;
 }
+
+/** Permanently deletes an invoice (any status) and its stored file. Returns false if it didn't exist. */
+export async function deleteInvoice(id: string): Promise<boolean> {
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return false;
+  const sql = await db();
+  const rows = await sql`delete from invoices where id = ${id} returning blob_url`;
+  if (rows.length === 0) return false;
+  await del(rows[0].blob_url).catch((err) => console.error("Deleting file failed:", err instanceof Error ? err.message : err));
+  return true;
+}
